@@ -12,7 +12,8 @@ namespace DotChat_Entities.DbSet
         {
             chatGroupMembers=new HashSet<ChatGroupMember>();
         }
-     
+        public string description { get; set; }
+        public string? groupAvatarImage { get; set; }
         public string? connectionId { get; set; }
         public bool isChannelClosed { get; set; } = false;
         public DateTime? channelCloseDate 
