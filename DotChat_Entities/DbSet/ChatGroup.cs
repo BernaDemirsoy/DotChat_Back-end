@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DotChat_Entities.DbSet
@@ -16,20 +17,12 @@ namespace DotChat_Entities.DbSet
         public string? groupAvatarImage { get; set; }
         public string? connectionId { get; set; }
         public bool isChannelClosed { get; set; } = false;
-        public DateTime? channelCloseDate 
-        {
-            get { return channelCloseDate; }
-            set
-            {
-                if(isChannelClosed)
-                    channelCloseDate = DateTime.UtcNow;
-                else channelCloseDate = null;
-            }
-        }
+        public DateTime? channelCloseDate { get; set; }
 
         public string? channelCloseUserId { get; set; }
         public virtual User? user { get; set; }
 
-        public virtual ICollection<ChatGroupMember> chatGroupMembers { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<ChatGroupMember>? chatGroupMembers { get; set; }
     }
 }

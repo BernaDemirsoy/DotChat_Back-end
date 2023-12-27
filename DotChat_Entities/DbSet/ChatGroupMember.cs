@@ -21,25 +21,10 @@ namespace DotChat_Entities.DbSet
 
         public bool isMemberChannelAdmin { get; set; }=false;
         public bool isChannelMutedByMember { get; set; } = false;
-        public bool isMemberRemovedFromChannel { get; set; }
-        public DateTime? memberRemovedDate {
-            get { return memberRemovedDate; }
-            set
-            {
-                if (isMemberRemovedFromChannel)
-                {
-                    memberRemovedDate = DateTime.UtcNow;
-                }
-                else
-                {
-                    
-                    memberRemovedDate = null;
-                }
-            
-            }
-        }
+        public bool isMemberRemovedFromChannel { get; set; } = false;
+        public DateTime? memberRemovedDate { get; set; }
 
-        public virtual ICollection<ChatGroupMessages> ChatGroupMessages { get; set; }
+        public virtual ICollection<ChatGroupMessages>? ChatGroupMessages { get; set; }
 
     }
 }

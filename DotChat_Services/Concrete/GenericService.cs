@@ -27,20 +27,29 @@ namespace DotChat_Services.Concrete
         //        return repository.Activate(id);
         //}
 
-        public bool Add(T item)
+        public async Task<bool> AddAsync(T item)
         {
-            return repository.Add(item);
+            try
+            {
+                return await repository.AddAsync(item);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception($"Hata {ex.Message}");
+            }
+            
         }
 
-        public bool Add(List<T> items)
+        public async Task<bool> AddAsync(List<T> items)
         {
-            return repository.Add(items);
+            return await repository.AddAsync(items);
         }
 
-        public bool Any(Expression<Func<T, bool>> exp)
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> exp)
         {
             if (exp != null)
-                return repository.Any(exp);
+                return await repository.AnyAsync(exp);
             else
                 return false;
         }
@@ -55,69 +64,69 @@ namespace DotChat_Services.Concrete
         //    return repository.GetActive(includes);
         //}
 
-        public List<T> GetAll()
+        public async Task<List<T>> GetAllAsync()
         {
-            return repository.GetAll();
+            return await repository.GetAllAsync();
         }
 
-        public IQueryable<T> GetAll(params Expression<Func<T, object>>[] includes)
+        public async Task<IQueryable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
         {
-            return repository.GetAll(includes);
+            return await repository.GetAllAsync(includes);
         }
 
-        public IQueryable<T> GetAll(Expression<Func<T, bool>> exp, params Expression<Func<T, object>>[] includes)
+        public async Task<IQueryable<T>> GetAllAsync(Expression<Func<T, bool>> exp, params Expression<Func<T, object>>[] includes)
         {
-            return repository.GetAll(exp, includes);
+            return await repository.GetAllAsync(exp, includes);
         }
 
-        public T GetByDefault(Expression<Func<T, bool>> exp)
+        public async Task<T> GetByDefaultAsync(Expression<Func<T, bool>> exp)
         {
-            return repository.GetByDefault(exp);
+            return await repository.GetByDefaultAsync(exp);
         }
 
-        public T GetById(int id)
+        public async Task<T> GetByIdAsync(int id)
         {
-            return repository.GetById(id);
+            return await repository.GetByIdAsync(id);
         }
 
-        public IQueryable<T> GetById(int id, params Expression<Func<T, object>>[] includes)
+        public async Task<IQueryable<T>> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
         {
-            return repository.GetById(id, includes);
+            return await repository.GetByIdAsync(id, includes);
         }
 
-        public List<T> GetDefault(Expression<Func<T, bool>> exp)
+        public async Task<List<T>> GetDefaultAsync(Expression<Func<T, bool>> exp)
         {
-            return repository.GetDefault(exp);
+            return await repository.GetDefaultAsync(exp);
         }
 
-        public bool Remove(T item)
+        public async Task<bool> RemoveAsync(T item)
         {
             if (item == null)
                 return false;
             else
-                return repository.Remove(item);
+                return await repository.RemoveAsync(item);
         }
 
-        public bool Remove(int id)
+        public async Task<bool> RemoveAsync(int id)
         {
             if (id <= 0)
                 return false;
             else
-                return repository.Remove(id);
+                return await repository.RemoveAsync(id);
         }
 
-        public bool RemoveAll(Expression<Func<T, bool>> exp)
+        public async Task<bool> RemoveAllAsync(Expression<Func<T, bool>> exp)
         {
-            return repository.RemoveAll(exp);
+            return await repository.RemoveAllAsync(exp);
         }
 
-        public bool Update(T item)
+        public async Task<bool> UpdateAsync(T item)
         {
 
             if (item == null)
                 return false;
             else
-                return repository.Update(item);
+                return await repository.UpdateAsync(item);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace DotChat_WebApi.Profiles
         {
             CreateMap<ContactUsersDto, User>().ReverseMap();
             CreateMap<List<ContactUsersDto>, List<User>>().ConvertUsing<ContactUserDtoListMapper>();
+            CreateMap<CreateGroupDto,ChatGroup>().ReverseMap();
         }
     }
 }

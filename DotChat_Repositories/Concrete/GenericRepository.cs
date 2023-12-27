@@ -21,13 +21,13 @@ namespace DotChat_Repositories.Concrete
             this.context = context;
         }
 
-        public bool Add(T item)
+        public async Task<bool> AddAsync(T item)
         {
             try
             {
 
                 context.Set<T>().Add(item);
-                return Save() > 0; //Bir tek nesne gelip ekleme işlemi yapıldığı için Save() metodundan 1 dönüyorsa buradan true dönsün.
+                return await SaveAsync() > 0; //Bir tek nesne gelip ekleme işlemi yapıldığı için Save() metodundan 1 dönüyorsa buradan true dönsün.
             }
             catch (Exception)
             {
@@ -36,7 +36,7 @@ namespace DotChat_Repositories.Concrete
             }
         }
 
-        public bool Add(List<T> items)
+        public async Task<bool> AddAsync(List<T> items)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace DotChat_Repositories.Concrete
                     }
                     scope.Complete(); //Bütün hepsi eklendiyse complete olacak(kaydedilecek) aksi halde hiç olmamış gibi davranıcak
                 }
-                return Save() > 0;
+                return await SaveAsync() > 0;
 
             }
             catch (Exception)
@@ -62,13 +62,13 @@ namespace DotChat_Repositories.Concrete
                 return false;
             }
         }
-        public bool Update(T item)
+        public async Task<bool> UpdateAsync(T item)
         {
             try
             {
 
                 context.Set<T>().Update(item);
-                return Save() > 0; //Bir tek nesne gelip ekleme işlemi yapıldığı için Save() metodundan 1 dönüyorsa buradan true dönsün.
+                return await SaveAsync() > 0; //Bir tek nesne gelip ekleme işlemi yapıldığı için Save() metodundan 1 dönüyorsa buradan true dönsün.
             }
             catch (Exception)
             {
@@ -76,13 +76,13 @@ namespace DotChat_Repositories.Concrete
                 return false;
             }
         }
-        public bool Remove(T item)
+        public async Task<bool> RemoveAsync(T item)
         {
             try
             {
 
                 context.Set<T>().Remove(item);
-                return Save() > 0; //Bir tek nesne gelip ekleme işlemi yapıldığı için Save() metodundan 1 dönüyorsa buradan true dönsün.
+                return await SaveAsync() > 0; //Bir tek nesne gelip ekleme işlemi yapıldığı için Save() metodundan 1 dönüyorsa buradan true dönsün.
             }
             catch (Exception)
             {
@@ -91,17 +91,16 @@ namespace DotChat_Repositories.Concrete
             }
         }
 
-        public bool Remove(int id)
+        public async Task<bool> RemoveAsync(int id)
         {
             try
             {
 
                 using (TransactionScope scope = new TransactionScope())
                 {
-                    T item = GetById(id);
-
+                    T item = await GetByIdAsync(id);
                     scope.Complete();
-                    return Remove(item);
+                    return await RemoveAsync(item.Id);
                 }
 
 
@@ -112,7 +111,7 @@ namespace DotChat_Repositories.Concrete
                 return false;
             }
         }
-        public bool RemoveAll(Expression<Func<T, bool>> exp)
+        public async Task<bool> RemoveAllAsync(Expression<Func<T, bool>> exp)
         {
             try
             {
@@ -124,7 +123,7 @@ namespace DotChat_Repositories.Concrete
                     foreach (var item in items)
                     {
 
-                        bool opResult = Update(item); //Db den silmiyoruz durumunu InActive olarak işaretliyoruz. Bunuda update metodu ile gerçekleştiriyoruz. İşlem sonucunuda opResult'ta tutuyoruz. (Update true or false)
+                        bool opResult = await UpdateAsync(item); //Db den silmiyoruz durumunu InActive olarak işaretliyoruz. Bunuda update metodu ile gerçekleştiriyoruz. İşlem sonucunuda opResult'ta tutuyoruz. (Update true or false)
                         if (opResult)
                         {
                             counter++; //Eğer ilgili item güncellendiyse sayac 1 artar.
@@ -152,16 +151,19 @@ namespace DotChat_Repositories.Concrete
                 return false;
             }
         }
-        public T GetById(int id) => context.Set<T>().Find(id); //tek satırlı metot yazma
+        public async Task<T> GetByIdAsync(int id)
+        {
+           return context.Set<T>().Find(id); //tek satırlı metot yazma
 
-        public IQueryable<T> GetById(int id, params Expression<Func<T, object>>[] includes)
+        } 
+        public async Task<IQueryable<T>> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
         {
             var query = context.Set<T>().Where(x => x.Id == id);
             if (includes != null)
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
             return query;
         }
-        public T GetByDefault(Expression<Func<T, bool>> exp)
+        public async Task<T> GetByDefaultAsync(Expression<Func<T, bool>> exp)
         {
             return context.Set<T>().FirstOrDefault(exp);
         }
@@ -184,25 +186,25 @@ namespace DotChat_Repositories.Concrete
         //        query = includes.Aggregate(query, (current, include) => current.Include(include));
         //    return query;
         //}
-        public List<T> GetAll()
+        public async Task<List<T>> GetAllAsync()
         {
             return context.Set<T>().ToList();
         }
-        public IQueryable<T> GetAll(params Expression<Func<T, object>>[] includes)
+        public async Task<IQueryable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
         {
             var query = context.Set<T>().AsQueryable();
             if (includes != null)
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
             return query;
         }
-        public IQueryable<T> GetAll(Expression<Func<T, bool>> exp, params Expression<Func<T, object>>[] includes)
+        public async Task<IQueryable<T>> GetAllAsync(Expression<Func<T, bool>> exp, params Expression<Func<T, object>>[] includes)
         {
             var query = context.Set<T>().Where(exp);
             if (includes != null)
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
             return query;
         }
-        public bool Any(Expression<Func<T, bool>> exp)
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> exp)
         {
             return context.Set<T>().Any(exp);
         }
@@ -212,13 +214,18 @@ namespace DotChat_Repositories.Concrete
         //    item.IsActive = true;
         //    return Update(item);
         //}
-        public int Save()
+        public async Task<int> SaveAsync()
         {
             return context.SaveChanges();
         }
         public void DetachEntity(T item)
         {
             context.Entry<T>(item).State = EntityState.Detached;// Bir entry'i (item) takip etmeyi bırakmak için kullanılır.
+        }
+
+        public Task<List<T>> GetDefaultAsync(Expression<Func<T, bool>> exp)
+        {
+            throw new NotImplementedException();
         }
     }
 }

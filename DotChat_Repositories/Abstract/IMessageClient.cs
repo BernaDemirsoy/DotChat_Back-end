@@ -13,6 +13,8 @@ namespace DotChat_Repositories.Abstract
        
         Task receiveMessage(string message);
 
+        Task groups(List<ChatGroup> groups);
+
         Task receiveConnectionId(string connectionId);
 
         Task UserLeaved(string connectionId);

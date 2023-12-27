@@ -10,37 +10,37 @@ namespace DotChat_Services.Abstact
 {
     public interface IGenericService<T> where T: BaseEntity
     {
-        bool Add(T item);
+        Task<bool> AddAsync(T item);
 
-        bool Add(List<T> items);
+        Task<bool> AddAsync(List<T> items);
 
-        bool Update(T item);
+        Task<bool> UpdateAsync(T item);
 
-        bool Remove(T item);
+        Task<bool> RemoveAsync(T item);
 
-        bool Remove(int id);
+        Task<bool> RemoveAsync(int id);
 
-        bool RemoveAll(Expression<Func<T, bool>> exp);
+        Task<bool> RemoveAllAsync(Expression<Func<T, bool>> exp);
 
-        T GetById(int id);
+        Task<T> GetByIdAsync(int id);
 
-        IQueryable<T> GetById(int id, params Expression<Func<T, object>>[] includes);
+        Task<IQueryable<T>> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes);
 
-        T GetByDefault(Expression<Func<T, bool>> exp);
+        Task<T> GetByDefaultAsync(Expression<Func<T, bool>> exp);
 
-        List<T> GetDefault(Expression<Func<T, bool>> exp);
+        Task<List<T>> GetDefaultAsync(Expression<Func<T, bool>> exp);
 
         //List<T> GetActive();
 
         //IQueryable<T> GetActive(params Expression<Func<T, object>>[] includes);
 
-        List<T> GetAll();
+        Task<List<T>> GetAllAsync();
 
-        IQueryable<T> GetAll(params Expression<Func<T, object>>[] includes);
+        Task<IQueryable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes);
 
-        IQueryable<T> GetAll(Expression<Func<T, bool>> exp, params Expression<Func<T, object>>[] includes);
+        Task<IQueryable<T>> GetAllAsync(Expression<Func<T, bool>> exp, params Expression<Func<T, object>>[] includes);
 
-        bool Any(Expression<Func<T, bool>> exp);
+        Task<bool> AnyAsync(Expression<Func<T, bool>> exp);
 
         //bool Activate(int id);
     }
