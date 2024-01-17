@@ -8,8 +8,8 @@ namespace DotChat_DTOs.Chat
 {
     public class SendMessageDto
     {
-        public int groupId { get; set; }
-
-        public string message { get; set; }
+        public string? receiverClientId { get; set; }
+        public string? currentUserId { get; set; }
+        public string? message { get; set; }
     }
 }

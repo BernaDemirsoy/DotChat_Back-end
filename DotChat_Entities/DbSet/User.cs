@@ -17,6 +17,7 @@ namespace DotChat_Entities.DbSet
         public string? avatarImage { get; set; }
         public bool? isAvatarImageSet { get; set; }
 
+        public string? connectionId { get; set; }
         public virtual ICollection<ChatConnectionLog>? chatConnectionLogs { get; set; }
     }
 }

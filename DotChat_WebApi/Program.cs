@@ -25,12 +25,13 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
-        policy.AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials()
-        .SetIsOriginAllowed(origin => true)
-        );
+    policy.AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials()
+    .SetIsOriginAllowed(origin => true)
+    );
 });
+
 builder.Services.AddTransient<MessageService>();
 builder.Services.AddTransient(typeof(IGenericService<>), typeof(GenericService<>));
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));

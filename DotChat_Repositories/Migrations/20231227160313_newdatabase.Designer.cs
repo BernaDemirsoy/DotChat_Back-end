@@ -4,6 +4,7 @@ using DotChat_Repositories.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotChat_Repositories.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231227160313_newdatabase")]
+    partial class newdatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,14 +35,14 @@ namespace DotChat_Repositories.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("connectedDate")
+                    b.Property<DateTime>("connectedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("connectionId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("disConnectedDate")
+                    b.Property<DateTime>("disConnectedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("userId")
@@ -65,13 +67,13 @@ namespace DotChat_Repositories.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("IsBinaryGroup")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("channelCloseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("channelCloseUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("connectionId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("description")
@@ -288,9 +290,6 @@ namespace DotChat_Repositories.Migrations
 
                     b.Property<string>("confirmedPasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("connectionId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("isAvatarImageSet")

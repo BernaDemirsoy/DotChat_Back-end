@@ -4,6 +4,7 @@ using DotChat_Repositories.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotChat_Repositories.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240108152400_newMig04")]
+    partial class newMig04
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,6 +74,9 @@ namespace DotChat_Repositories.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("channelCloseUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("connectionId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("description")

@@ -14,9 +14,9 @@ namespace DotChat_Entities.DbSet
 
         public string connectionId { get; set; }
 
-        public DateTime connectedDate { get; set; }
+        public DateTime? connectedDate { get; set; }
 
-        public DateTime disConnectedDate { get; set; }
+        public DateTime? disConnectedDate { get; set; }
 
     }
 }

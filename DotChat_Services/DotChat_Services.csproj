@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DotChat_DTOs\DotChat_DTOs.csproj" />
     <ProjectReference Include="..\DotChat_Repositories\DotChat_Repositories.csproj" />
   </ItemGroup>
 

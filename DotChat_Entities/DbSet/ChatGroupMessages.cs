@@ -11,7 +11,6 @@ namespace DotChat_Entities.DbSet
        
         public int chatGroupMemberId { get; set; }
         public virtual ChatGroupMember chatGroupMember { get; set; }
-
         public string message { get; set; }
 
         public DateTime messageTimestamp { get; set; }

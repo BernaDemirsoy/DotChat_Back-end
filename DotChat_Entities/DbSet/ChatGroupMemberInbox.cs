@@ -8,51 +8,18 @@ namespace DotChat_Entities.DbSet
 {
     public class ChatGroupMemberInbox:BaseEntity
     {
-       
-        public int chatGroupMemberId 
-        {
-            get
-            {
-                return chatGroupMemberId;
-            }
-            set
-            {
-                chatGroupMemberId = chatGroupMessages.chatGroupMemberId;
-            } 
-        }
 
-        public int chatGroupMessagesId
-        { get { return chatGroupMessagesId; }
-            set
-            {
-                chatGroupMessagesId = chatGroupMessages.Id;
-            } 
-        }
+
+        public int chatGroupMemberId { get; set; }
+       
+        public int chatGroupMessagesId { get; set; }
         public virtual ChatGroupMessages chatGroupMessages { get; set; }
 
         public bool isRead { get; set; } = false;
-        public DateTime? readDate{
-            get { return readDate; }
-            set
-            {
-                if (isRead)
-                    readDate = DateTime.UtcNow;
-                else
-                    readDate = null;
-            } 
-        }
+        public DateTime? readDate { get; set; }
 
         public bool isArchived { get; set; } = false;
-        public DateTime? archiveDate
-        {
-            get { return readDate; }
-            set
-            {
-                if (isArchived)
-                    archiveDate = DateTime.UtcNow;
-                else
-                    archiveDate = null;
-            }
-        }
+        public DateTime? archiveDate { get; set; }
+        
     }
 }

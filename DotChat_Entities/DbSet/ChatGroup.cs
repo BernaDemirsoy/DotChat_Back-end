@@ -12,17 +12,19 @@ namespace DotChat_Entities.DbSet
         public ChatGroup()
         {
             chatGroupMembers=new HashSet<ChatGroupMember>();
+            
         }
         public string description { get; set; }
         public string? groupAvatarImage { get; set; }
-        public string? connectionId { get; set; }
         public bool isChannelClosed { get; set; } = false;
         public DateTime? channelCloseDate { get; set; }
 
         public string? channelCloseUserId { get; set; }
         public virtual User? user { get; set; }
+        public int IsBinaryGroup { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<ChatGroupMember>? chatGroupMembers { get; set; }
+        
     }
 }

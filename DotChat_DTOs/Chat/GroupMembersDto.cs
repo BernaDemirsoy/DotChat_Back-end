@@ -9,9 +9,11 @@ namespace DotChat_DTOs.Chat
 {
     public class GroupMembersDto
     {
-        public ChatGroup chatGroup { get; set; }
+        public string? currentUserId { get; set; }
 
-        public List<ContactUsersDto> users { get; set; }
+        public ChatGroup? chatGroup { get; set; }
+
+        public ContactUsersDto? contactUser { get; set; }
 
     }
 }
