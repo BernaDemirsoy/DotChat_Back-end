@@ -14,8 +14,11 @@ namespace DotChat_DTOs.Chat
 
         public string UserName { get; set; }
 
+        
         public string? avatarImage { get; set; }
 
         public bool? isAvatarImageSet { get; set; }
+
+        public int? ChatGroupId { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using DotChat_Repositories.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotChat_Repositories.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240118112745_newMig05")]
+    partial class newMig05
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,13 +149,10 @@ namespace DotChat_Repositories.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("TochatGroupMemberId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("archiveDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("chatGroupId")
+                    b.Property<int>("chatGroupMemberId")
                         .HasColumnType("int");
 
                     b.Property<int>("chatGroupMessagesId")
@@ -171,10 +170,6 @@ namespace DotChat_Repositories.Migrations
                     b.Property<DateTime?>("readDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("chatGroupMessagesId")
@@ -191,14 +186,8 @@ namespace DotChat_Repositories.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("ChatGroupId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
-
-                    b.Property<int>("TochatGroupMemberId")
-                        .HasColumnType("int");
 
                     b.Property<int>("chatGroupMemberId")
                         .HasColumnType("int");
@@ -212,10 +201,6 @@ namespace DotChat_Repositories.Migrations
 
                     b.Property<DateTime>("messageTimestamp")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -464,7 +449,7 @@ namespace DotChat_Repositories.Migrations
                         .IsRequired();
 
                     b.HasOne("DotChat_Entities.DbSet.User", "user")
-                        .WithMany("ChatGroupMembers")
+                        .WithMany()
                         .HasForeignKey("userId");
 
                     b.Navigation("chatGroup");
@@ -475,7 +460,7 @@ namespace DotChat_Repositories.Migrations
             modelBuilder.Entity("DotChat_Entities.DbSet.ChatGroupMemberInbox", b =>
                 {
                     b.HasOne("DotChat_Entities.DbSet.ChatGroupMessages", "chatGroupMessages")
-                        .WithOne("chatGroupMemberInboxes")
+                        .WithOne("chatGroupMemberInboxe")
                         .HasForeignKey("DotChat_Entities.DbSet.ChatGroupMemberInbox", "chatGroupMessagesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -557,14 +542,12 @@ namespace DotChat_Repositories.Migrations
 
             modelBuilder.Entity("DotChat_Entities.DbSet.ChatGroupMessages", b =>
                 {
-                    b.Navigation("chatGroupMemberInboxes")
+                    b.Navigation("chatGroupMemberInboxe")
                         .IsRequired();
                 });
 
             modelBuilder.Entity("DotChat_Entities.DbSet.User", b =>
                 {
-                    b.Navigation("ChatGroupMembers");
-
                     b.Navigation("chatConnectionLogs");
                 });
 #pragma warning restore 612, 618

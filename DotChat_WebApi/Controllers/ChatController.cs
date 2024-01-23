@@ -47,22 +47,27 @@ namespace DotChat_WebApi.Controllers
 
         [HttpPost]
         [Route("[action]")]
+
+        //Buraya chatgroupId ile direkt mesaj gönderme işlemini düzelt
         public async Task<IActionResult> SendMessageToBinaryGroup(SendMessageDto sendMessageDto)
         {
             try
             {
                 var chatGroupMembers = await chatGroupMemberService.GetAllAsync();
-                var chatGroupIds = chatGroupMembers.Where(a => a.memberUserId == sendMessageDto.currentUserId).ToList();
+                var chatGroupMemberList = chatGroupMembers.Where(a => a.memberUserId == sendMessageDto.currentUserId);
+                var chatGroupIds = chatGroupMemberList.Select(a => a.chatgroupId).ToList();
                 foreach (var chatGroupId in chatGroupIds)
                 {
                     foreach (var member in chatGroupMembers)
                     {
-                       if(member.chatgroupId== chatGroupId.chatgroupId && member.memberUserId == sendMessageDto.receiverClientId)
+                       if(member.chatgroupId== chatGroupId && member.memberUserId == sendMessageDto.receiverClientId)
                         {
                             var chatGroupMessage = new ChatGroupMessages
                             {
                                 chatGroupMember = member,
-                                chatGroupMemberId = member.Id,
+                                TochatGroupMemberId = member.Id,
+                                userId=member.memberUserId,
+                                ChatGroupId=chatGroupId,
                                 message = sendMessageDto.message,
                                 messageTimestamp = DateTime.Now,
                             };
@@ -77,9 +82,12 @@ namespace DotChat_WebApi.Controllers
                             }
                             var chatgroupInbox = new ChatGroupMemberInbox
                             {
-                                chatGroupMemberId = member.Id,
+                                TochatGroupMemberId = member.Id,
+                                chatGroupId = chatGroupId,
                                 chatGroupMessagesId = chatGroupMessage.Id,
                                 chatGroupMessages = chatGroupMessage,
+                                userId = member.memberUserId,
+                                isDelivered = true,
 
                             };
                             bool resultSecond = await chatGroupMemberInboxService.AddAsync(chatgroupInbox);
@@ -116,85 +124,16 @@ namespace DotChat_WebApi.Controllers
         //        return BadRequest($"An error occurred: {ex.Message}");
         //    }
 
-        //}
-        [HttpPost]
+      
+        [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> findGroupChatIdByClientId(FindGroupChatIdDto findGroupChatIdDto)
+        public async Task<IActionResult> getAllChatMessage(int ChatGroupId)
         {
-            var chatGroupMembers = await chatGroupMemberService.GetAllAsync();
-            var chatGroupIds = chatGroupMembers.Where(a => a.memberUserId == findGroupChatIdDto.currentUserId).ToList();
-            int findedChatGroupId=0;
-            foreach (var chatGroupId in chatGroupIds)
-            {
-                foreach (var member in chatGroupMembers)
-                {
-                    if (member.chatgroupId == chatGroupId.chatgroupId && member.memberUserId == findGroupChatIdDto.clientUserId)
-                    {
-                        findedChatGroupId=chatGroupId.chatgroupId;
-                        break;
-                    }
-                }
-            }
-            var userList=chatGroupMembers.Where(a => a.chatgroupId == findedChatGroupId).ToList();
-            int currentUserMemberId=0;
-            int clientUserMemberId=0;
-            foreach (var user in userList)
-            {
-                if(user.memberUserId== findGroupChatIdDto.clientUserId)
-                {
-                    clientUserMemberId=user.Id;
-                }
-                else if(user.memberUserId == findGroupChatIdDto.currentUserId)
-                {
-                    currentUserMemberId=user.Id;
-                }
-            }
-            if(currentUserMemberId!=null && clientUserMemberId != null)
-            {
-                var viewData = new
-                {
-                    clientUserMemberId=clientUserMemberId,
-                    currentUserMemberId=currentUserMemberId,
-                };
-                return Ok(viewData);
-            }
-            else
-            {
-                return BadRequest("Userların memberIdleri bulunamadı");
-            }
-           
-        }
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> getAllChatMessage(FindGroupChatIdDto findGroupChatIdDto)
-        {
-            var allMessages = await chatGroupMemberInboxService.GetAllAsync(a=>a.chatGroupMessages);
-            var chatGroupMembers = await chatGroupMemberService.GetAllAsync();
-            var chatGroupIds = chatGroupMembers.Where(a => a.memberUserId == findGroupChatIdDto.currentUserId).ToList();
-            int findedChatGroupId = 0;
-            foreach (var chatGroupId in chatGroupIds)
-            {
-                foreach (var member in chatGroupMembers)
-                {
-                    if (member.chatgroupId == chatGroupId.chatgroupId && member.memberUserId == findGroupChatIdDto.clientUserId)
-                    {
-                        findedChatGroupId = chatGroupId.chatgroupId;
-                        break;
-                    }
-                }
-            }
-            var chatmembers=await chatGroupMemberService.GetAllAsync(a=>a.chatGroup);
-            var listChatMember = chatmembers.Where(a => a.chatgroupId == findedChatGroupId);
-            var listMessages = new List<ChatGroupMemberInbox>();
-            foreach (var member in listChatMember)
-            {
-                var searchedUser = allMessages.Where(a => a.chatGroupMemberId == member.Id).FirstOrDefault();
-                if (searchedUser!=null)
-                {
-                    listMessages.Add(searchedUser);
-                }
-            }
-            return Ok(listMessages);
+
+            var listMessages = await chatGroupMessageService.GetAllAsync();
+            var listMessageByGroupId = listMessages.Where(a => a.ChatGroupId== ChatGroupId).ToList();
+            
+            return Ok(listMessageByGroupId);
             
         }
 
@@ -290,12 +229,12 @@ namespace DotChat_WebApi.Controllers
         }
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> GetAllGroupChats()
+        public async Task<IActionResult> GetAllGroupChats(int filteredId)
         {
             try
             {
                 var chatGroups= await chatgroupService.GetAllAsync();
-                var chatGroupsAll = chatGroups.Where(a => a.IsBinaryGroup == 0);
+                var chatGroupsAll = chatGroups.Where(a => a.IsBinaryGroup == filteredId);
                 return Ok(chatGroupsAll);
 
             }
@@ -309,17 +248,16 @@ namespace DotChat_WebApi.Controllers
         }
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> GroupsExistingControl(string description)
+        public async Task<IActionResult> GroupsExistingControl(int ChatGroupId)
         {
             try
             {
-                
-                string[] names=description.Split(new string[] { "//" }, StringSplitOptions.None);
-                var chatGroups = await chatGroupMemberService.GetAllAsync(a => a.chatGroup);
-                var list=chatGroups.Select(a=>a.chatGroup).Where(a => a.description.Contains(names[0]) && a.description.Contains(names[1])).ToList();
-                if (list.Count() >= 0)
+
+                var list = await chatgroupService.GetAllAsync();
+                var chatgroup = list.Where(a => a.Id == ChatGroupId).ToList();
+                if (chatgroup.Count()>=0)
                 {
-                    return Ok(list);
+                    return Ok(chatgroup);
                 }
                 return BadRequest(StatusCodes.Status404NotFound);
 
@@ -340,15 +278,57 @@ namespace DotChat_WebApi.Controllers
         {
             try
             {
-                var userList = userManager.Users.ToList();
+                int count = 0;
+                var userList = userManager.Users
+                .Include(u => u.ChatGroupMembers)       
+                .ToList();
                 userList.Remove(userList.Where(x => x.Id == userid).ToList().FirstOrDefault());
                 userList.Remove(userList.Where(a => a.Id == "7a84b14f-0397-4f30-bec5-cbeeab3e5fa0").FirstOrDefault());
                 List<ContactUsersDto> contactUserList = new List<ContactUsersDto>();
                 if (userList.Count >= 0)
                 {
                     mapper.Map(userList, contactUserList);
+                    foreach (User user in userList)
+                    {
+                        foreach (var members in user.ChatGroupMembers)
+                        {
+                            foreach (var item in contactUserList)
+                            {
+                                if (item.Id == user.Id)
+                                {
+                                    var listMember = await chatGroupMemberService.GetAllAsync(a => a.chatgroupId == members.chatgroupId);
+                                    foreach (var chatgroupMember in listMember)
+                                    {
+
+                                        if (chatgroupMember.memberUserId == userid || chatgroupMember.memberUserId == user.Id)
+                                        {
+                                            count++;
+                                        }
+                                        else
+                                        {
+                                            continue;
+                                        }
+
+                                    }
+                                    if (count == 2)
+                                    {
+                                        item.ChatGroupId = members.chatgroupId;
+                                        
+                                    }
+                                    count = 0;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                               
+
+                            }
+                        }
+                    }
                     return Ok(contactUserList);
                 }
+               
                 else
                     return BadRequest();
             }

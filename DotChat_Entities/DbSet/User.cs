@@ -12,6 +12,7 @@ namespace DotChat_Entities.DbSet
         public User()
         {
             chatConnectionLogs=new HashSet<ChatConnectionLog>();
+            ChatGroupMembers = new HashSet<ChatGroupMember>();
         }
         public string confirmedPasswordHash { get; set; }
         public string? avatarImage { get; set; }
@@ -19,5 +20,6 @@ namespace DotChat_Entities.DbSet
 
         public string? connectionId { get; set; }
         public virtual ICollection<ChatConnectionLog>? chatConnectionLogs { get; set; }
+        public virtual ICollection<ChatGroupMember>? ChatGroupMembers { get; set; }
     }
 }

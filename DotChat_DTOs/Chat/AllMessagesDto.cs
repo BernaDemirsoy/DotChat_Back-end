@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace DotChat_DTOs.Chat
 {
-    public class FindGroupChatIdDto
+    public class AllMessagesDto
     {
-        public string currentUserId { get; set; }
-        public string clientUserId { get; set; }
+
     }
 }

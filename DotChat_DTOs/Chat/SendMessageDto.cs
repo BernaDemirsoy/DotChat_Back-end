@@ -11,5 +11,6 @@ namespace DotChat_DTOs.Chat
         public string? receiverClientId { get; set; }
         public string? currentUserId { get; set; }
         public string? message { get; set; }
+        public int chatGroupId { get; set; }
     }
 }
