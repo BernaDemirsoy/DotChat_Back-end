@@ -20,12 +20,13 @@ namespace DotChat_Repositories.Concrete.Hubs
     {
         private readonly UserManager<User> userManager;
         private readonly IGenericService<ChatConnectionLog> chatConnectionService;
-
+        private readonly IGenericService<ChatGroupMessages> chatGroupMessagesService;
         static bool isConnected=false;
-        public MessageHub(UserManager<User> userManager, IGenericService<ChatConnectionLog> chatConnectionService)
+        public MessageHub(UserManager<User> userManager, IGenericService<ChatConnectionLog> chatConnectionService,IGenericService<ChatGroupMessages> chatGroupMessagesService)
         {
             this.userManager = userManager;
             this.chatConnectionService = chatConnectionService;
+            this.chatGroupMessagesService = chatGroupMessagesService;
         }
 
         
@@ -58,7 +59,20 @@ namespace DotChat_Repositories.Concrete.Hubs
             
             
         }
+        public async Task SetUnreadedMessage(UnreadedMessagesCountDto messagesCountDto)
+        {
+            string clientConnectionId = userManager.Users.Where(a => a.Id == messagesCountDto.receiverUserId).FirstOrDefault().connectionId;
+            string name = userManager.Users.Where(a => a.Id == messagesCountDto.currentUserId).FirstOrDefault().UserName;
+            var allMessages = await chatGroupMessagesService.GetAllAsync();
+            var filteredMessagesCount = allMessages.Where(a => a.ChatGroupId == messagesCountDto.groupChatId && a.isRead == false).Count();
+            UnreadCountHubDtocs result = new UnreadCountHubDtocs
+            {
+                count = filteredMessagesCount,
+                userName = name,
+            };
 
+            await Clients.Client(clientConnectionId).receiveCount(result);
+        }
         public override async Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();

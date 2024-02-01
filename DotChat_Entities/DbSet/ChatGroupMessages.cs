@@ -18,10 +18,19 @@ namespace DotChat_Entities.DbSet
 
         public string userId { get; set; }
 
-        public DateTime messageTimestamp { get; set; }
-
         public bool isDeleted { get; set; } = false;
 
-        public virtual ChatGroupMemberInbox chatGroupMemberInboxes { get; set; }
+        public bool isRead { get; set; } = false;
+
+        public bool isDelivered { get; set; } = false;
+
+        public bool isArchived { get; set; } = false;
+        public DateTime? deliveredDate { get; set; }
+
+        public DateTime? readDate { get; set; }
+
+        public DateTime? deletedDate { get; set; }
+        public DateTime? archiveDate { get; set; }
+
     }
 }

@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace DotChat_DTOs.Chat
 {
-    public class SendMessageDto
+    public class UnreadedMessagesCountDto
     {
-        public string? receiverClientId { get; set; }
+        public int groupChatId { get; set; }
         public string? currentUserId { get; set; }
-        public string? message { get; set; }
-        public int? chatGroupId { get; set; }
+        public string? contactName { get; set; }
+        public string? receiverUserId { get; set; }
+
     }
 }

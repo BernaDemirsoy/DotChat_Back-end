@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace DotChat_DTOs.Chat
 {
-    public class AllMessagesDto
+    public class UnreadCountHubDtocs
     {
+        public int count { get; set; }
 
+        public string userName { get; set; }
     }
 }

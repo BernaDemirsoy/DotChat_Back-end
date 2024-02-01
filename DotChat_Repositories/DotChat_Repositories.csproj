@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DotChat_DTOs\DotChat_DTOs.csproj" />
     <ProjectReference Include="..\DotChat_Entities\DotChat_Entities.csproj" />
   </ItemGroup>
 

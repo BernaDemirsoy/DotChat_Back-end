@@ -28,11 +28,10 @@ namespace DotChat_WebApi.Controllers
         private readonly IGenericService<ChatGroup> chatgroupService;
         private readonly IGenericService<ChatGroupMember> chatGroupMemberService;
         private readonly IGenericService<ChatGroupMessages> chatGroupMessageService;
-        private readonly IGenericService<ChatGroupMemberInbox> chatGroupMemberInboxService;
         private readonly IMapper mapper;
   
 
-        public ChatController(UserManager<User> userManager, IHubContext<MessageHub, IMessageClient> hubContext, IGenericService<ChatConnectionLog> chatConnectionService, IGenericService<ChatGroup> chatgroupService, IGenericService<ChatGroupMember> chatGroupMemberService, IGenericService<ChatGroupMessages> chatGroupMessageService, IGenericService<ChatGroupMemberInbox> chatGroupMemberInboxService,IMapper mapper)
+        public ChatController(UserManager<User> userManager, IHubContext<MessageHub, IMessageClient> hubContext, IGenericService<ChatConnectionLog> chatConnectionService, IGenericService<ChatGroup> chatgroupService, IGenericService<ChatGroupMember> chatGroupMemberService, IGenericService<ChatGroupMessages> chatGroupMessageService,IMapper mapper)
         {
 
             this.userManager = userManager;
@@ -41,7 +40,6 @@ namespace DotChat_WebApi.Controllers
             this.chatgroupService = chatgroupService;
             this.chatGroupMemberService = chatGroupMemberService;
             this.chatGroupMessageService = chatGroupMessageService;
-            this.chatGroupMemberInboxService = chatGroupMemberInboxService;
             this.mapper = mapper;
         }
 
@@ -53,53 +51,42 @@ namespace DotChat_WebApi.Controllers
         {
             try
             {
+
                 var chatGroupMembers = await chatGroupMemberService.GetAllAsync();
-                var chatGroupMemberList = chatGroupMembers.Where(a => a.memberUserId == sendMessageDto.currentUserId);
-                var chatGroupIds = chatGroupMemberList.Select(a => a.chatgroupId).ToList();
-                foreach (var chatGroupId in chatGroupIds)
+                var chatGroupMemberList = chatGroupMembers.Where(a => a.chatgroupId == sendMessageDto.chatGroupId).ToList();
+                if (chatGroupMemberList.Count() == 2)
                 {
-                    foreach (var member in chatGroupMembers)
+                    var chatGroupMessage = new ChatGroupMessages
                     {
-                       if(member.chatgroupId== chatGroupId && member.memberUserId == sendMessageDto.receiverClientId)
-                        {
-                            var chatGroupMessage = new ChatGroupMessages
-                            {
-                                chatGroupMember = member,
-                                TochatGroupMemberId = member.Id,
-                                userId=member.memberUserId,
-                                ChatGroupId=chatGroupId,
-                                message = sendMessageDto.message,
-                                messageTimestamp = DateTime.Now,
-                            };
+                        chatGroupMember =  chatGroupMemberList.Where(a=>a.memberUserId==sendMessageDto.currentUserId).FirstOrDefault(),
+                        TochatGroupMemberId = chatGroupMemberList.Where(a => a.memberUserId == sendMessageDto.receiverClientId).FirstOrDefault().Id,
+                        userId = chatGroupMemberList.Where(a => a.memberUserId == sendMessageDto.receiverClientId).FirstOrDefault().memberUserId,
+                        ChatGroupId = sendMessageDto.chatGroupId.Value,
+                        message = sendMessageDto.message,
+                        isDelivered = true,
+                        deliveredDate = DateTime.UtcNow,
+                    };
+                    bool result = await chatGroupMessageService.AddAsync(chatGroupMessage);
+                    if (!result)
+                    {
 
-                            bool result=await chatGroupMessageService.AddAsync(chatGroupMessage);
-                            if (!result)
-                            {
+                        return BadRequest();
 
-                                return BadRequest();
-                                
-                                
-                            }
-                            var chatgroupInbox = new ChatGroupMemberInbox
-                            {
-                                TochatGroupMemberId = member.Id,
-                                chatGroupId = chatGroupId,
-                                chatGroupMessagesId = chatGroupMessage.Id,
-                                chatGroupMessages = chatGroupMessage,
-                                userId = member.memberUserId,
-                                isDelivered = true,
 
-                            };
-                            bool resultSecond = await chatGroupMemberInboxService.AddAsync(chatgroupInbox);
-                            if (!resultSecond)
-                            {
-                                return BadRequest();
-                            }
-                        };
                     }
+                    return Ok("Mesaj database kaydedildi");
                 }
-                return Ok("Mesaj database kaydedildi.");
-                
+                else if (chatGroupMemberList.Count() > 2)
+                {
+                    return BadRequest("Bu bir binary grup olmalıydı bir hata olmalı!");
+                }
+                else if(chatGroupMemberList.Count() <2)
+                {
+                    return BadRequest("2 den az member olamaz.");
+
+                }
+                else return BadRequest("Beklenmedik bir hata oldu."); 
+               
             }
             catch (Exception ex)
             {
@@ -338,6 +325,28 @@ namespace DotChat_WebApi.Controllers
                 return BadRequest($"{ex.Message}");
             }
             
+
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+
+        //Buraya girmiyor sebebine bak!
+        public async Task<IActionResult> GetUnreadedMessagesCount(UnreadedMessagesCountDto messagesCountDto)
+        {
+            try
+            {
+                var list = await chatGroupMessageService.GetAllAsync();
+                var filteredListCount = list.Where(a => a.isRead == false && a.ChatGroupId == messagesCountDto.groupChatId && a.userId==messagesCountDto.currentUserId).Count();
+                return Ok(filteredListCount);
+                
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest($"{ex.Message}");
+            }
+
 
         }
 

@@ -4,6 +4,7 @@ using DotChat_Repositories.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DotChat_Repositories.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240123142351_newMig11")]
+    partial class newMig11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,6 +138,56 @@ namespace DotChat_Repositories.Migrations
                     b.ToTable("chatGroupMembers");
                 });
 
+            modelBuilder.Entity("DotChat_Entities.DbSet.ChatGroupMemberInbox", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TochatGroupMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("archiveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("chatGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("chatGroupMessagesId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("deliveredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("isArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isDelivered")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isRead")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("readDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("chatGroupMessagesId")
+                        .IsUnique();
+
+                    b.ToTable("ChatGroupMemberInboxes");
+                });
+
             modelBuilder.Entity("DotChat_Entities.DbSet.ChatGroupMessages", b =>
                 {
                     b.Property<int>("Id")
@@ -153,35 +205,17 @@ namespace DotChat_Repositories.Migrations
                     b.Property<int>("TochatGroupMemberId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("archiveDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("chatGroupMemberId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("deletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("deliveredDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("isArchived")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isDelivered")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isRead")
                         .HasColumnType("bit");
 
                     b.Property<string>("message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("readDate")
+                    b.Property<DateTime>("messageTimestamp")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("userId")
@@ -443,6 +477,17 @@ namespace DotChat_Repositories.Migrations
                     b.Navigation("user");
                 });
 
+            modelBuilder.Entity("DotChat_Entities.DbSet.ChatGroupMemberInbox", b =>
+                {
+                    b.HasOne("DotChat_Entities.DbSet.ChatGroupMessages", "chatGroupMessages")
+                        .WithOne("chatGroupMemberInboxes")
+                        .HasForeignKey("DotChat_Entities.DbSet.ChatGroupMemberInbox", "chatGroupMessagesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("chatGroupMessages");
+                });
+
             modelBuilder.Entity("DotChat_Entities.DbSet.ChatGroupMessages", b =>
                 {
                     b.HasOne("DotChat_Entities.DbSet.ChatGroupMember", "chatGroupMember")
@@ -513,6 +558,12 @@ namespace DotChat_Repositories.Migrations
             modelBuilder.Entity("DotChat_Entities.DbSet.ChatGroupMember", b =>
                 {
                     b.Navigation("ChatGroupMessages");
+                });
+
+            modelBuilder.Entity("DotChat_Entities.DbSet.ChatGroupMessages", b =>
+                {
+                    b.Navigation("chatGroupMemberInboxes")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DotChat_Entities.DbSet.User", b =>
