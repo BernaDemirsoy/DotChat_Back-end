@@ -64,7 +64,7 @@ namespace DotChat_Repositories.Concrete.Hubs
             string clientConnectionId = userManager.Users.Where(a => a.Id == messagesCountDto.receiverUserId).FirstOrDefault().connectionId;
             string name = userManager.Users.Where(a => a.Id == messagesCountDto.currentUserId).FirstOrDefault().UserName;
             var allMessages = await chatGroupMessagesService.GetAllAsync();
-            var filteredMessagesCount = allMessages.Where(a => a.ChatGroupId == messagesCountDto.groupChatId && a.isRead == false).Count();
+            var filteredMessagesCount = allMessages.Where(a => a.ChatGroupId == messagesCountDto.groupChatId && a.isRead == false && a.userId==messagesCountDto.receiverUserId).Count();
             UnreadCountHubDtocs result = new UnreadCountHubDtocs
             {
                 count = filteredMessagesCount,
