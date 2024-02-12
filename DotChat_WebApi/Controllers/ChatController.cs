@@ -242,12 +242,7 @@ namespace DotChat_WebApi.Controllers
 
                 var list = await chatgroupService.GetAllAsync();
                 var chatgroup = list.Where(a => a.Id == ChatGroupId).ToList();
-                if (chatgroup.Count()>=0)
-                {
-                    return Ok(chatgroup);
-                }
-                return BadRequest(StatusCodes.Status404NotFound);
-
+                return Ok(chatgroup);
             }
             catch (Exception ex)
             {
@@ -257,7 +252,50 @@ namespace DotChat_WebApi.Controllers
 
 
         }
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> CreateGroupForStarting(User registeredUser)
+        {
+            try
+            {
+                string groupName;
+                var contactList=userManager.Users.Where(a=>a.Id!=registeredUser.Id).ToList();
+                for (global::System.Int32 i = 0; i < contactList.Count(); i++)
+                {
+                    groupName = registeredUser.UserName + "//" + contactList[i].UserName;
+                    CreateGroupDto data = new CreateGroupDto
+                    {
+                        description = groupName,
+                        IsBinaryGroup = 1,
+                    };
+                    var result = await createGroup(data);
+                    var okResult = result as OkObjectResult;
+                    if (okResult != null)
+                    {
+                        var chatGroup = okResult.Value as ChatGroup;
+                        if (chatGroup != null)
+                        {
+                            ContactUsersDto dto = new();
+                            GroupMembersDto member = new GroupMembersDto
+                            {
+                                currentUserId = registeredUser.Id,
+                                chatGroup = chatGroup,
+                                contactUser = mapper.Map((User)contactList[i], dto)
+                            };
+                            var resultMember = await createGroupMembers(member);
+                        }
+                    }
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
 
+                return BadRequest($"An error occurred: {ex.Message}");
+            }
+
+
+        }
 
         [HttpGet]
         [Route("[action]")]
